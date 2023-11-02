@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Generator</title>
+    <style>
+        /* Add your CSS styling here if needed */
+    </style>
+</head>
+<body>
+    <div id="code-display"></div>
+    <script>
+        // Function to fetch and display a new code from the Flask backend
+        function fetchAndDisplayCode() {
+            fetch('/get_code')
+                .then(response => response.text())
+                .then(code => {
+                    document.getElementById('code-display').textContent = 'Generated Code: ' + code;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // Display a code immediately when the page loads
+        fetchAndDisplayCode();
+
+        // Set an interval to refresh the code every 30 seconds
+        setInterval(fetchAndDisplayCode, 5000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <title>Show Attendance Code</title>
+</head>
+<body>
+    <header>
+        <h1>Show Attendance Code</h1>
+    </header>
+    <div class="container">
+        <div class="code-container">
+            <p class="small-text">Current code:</p>
+            <p id="attendanceCode" class="code">Loading...</p>
+            <p id="countdown" class="small-text">Refreshing in <span id="timer">30</span> seconds</p>
+            <button id="goBackButton" class="button">Go Back</button>
+        </div>
+    </div>
+    <script>
+        // Function to update the code and timer
+        function updateCode() {
+            fetch('/get_code')
+                .then(response => response.text())
+                .then(code => {
+                    document.getElementById('attendanceCode').textContent = code;
+                })
+                .catch(error => {
+                    console.error('Error fetching code: ' + error);
+                });
+        }
+
+        // Function to update the timer and request a new code
+        function updateTimer() {
+            let countdown = 30;
+            const timerElement = document.getElementById('timer');
+
+            function countDown() {
+                if (countdown === 0) {
+                    countdown = 30;
+                    updateCode();
+                } else {
+                    countdown--;
+                }
+                timerElement.textContent = countdown;
+            }
+
+            setInterval(countDown, 1000);
+            countDown(); // Initialize the countdown
+        }
+
+        document.getElementById('goBackButton').addEventListener('click', function () {
+            window.location.href = '/';
+        });
+
+        // Initial code update
+        updateCode();
+        // Start the timer
+        updateTimer();
+    </script>
+</body>
+</html>

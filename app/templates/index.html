@@ -3,31 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Code Generator</title>
-    <style>
-        /* Add your CSS styling here if needed */
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Attendance Checker App</title>
 </head>
 <body>
-    <div id="code-display"></div>
-    <script>
-        // Function to fetch and display a new code from the Flask backend
-        function fetchAndDisplayCode() {
-            fetch('/get_code')
-                .then(response => response.text())
-                .then(code => {
-                    document.getElementById('code-display').textContent = 'Generated Code: ' + code;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-        }
-
-        // Display a code immediately when the page loads
-        fetchAndDisplayCode();
-
-        // Set an interval to refresh the code every 30 seconds
-        setInterval(fetchAndDisplayCode, 5000);
-    </script>
+    <header>
+        <h1>Welcome to Attendance Checker</h1>
+    </header>
+    <div class="container">
+        <div class="buttons">
+            <a href="{{ url_for('show_attendance') }}" class="button">Show Attendance Code</a>
+            <a href="{{ url_for('submit_attendance') }}" class="button">Submit Attendance Code</a>
+            <a href="{{ url_for('verify_attendance') }}" class="button">Verify Student Attendance</a>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>

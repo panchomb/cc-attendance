@@ -16,49 +16,66 @@
             <p class="small-text">Current code:</p>
             <p id="attendanceCode" class="code">Loading...</p>
             <p id="countdown" class="small-text">Refreshing in <span id="timer">30</span> seconds</p>
-            <button id="goBackButton" class="button">Go Back</button>
+            <button id="stopAttendanceButton" class="button">Stop Attendance</button>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.3.2/dist/socket.io.js"></script>
     <script>
-        // Function to update the code and timer
-        function updateCode() {
-            fetch('/get_code')
-                .then(response => response.text())
-                .then(code => {
-                    document.getElementById('attendanceCode').textContent = code;
-                })
-                .catch(error => {
-                    console.error('Error fetching code: ' + error);
-                });
-        }
+        const socket = io.connect('http://' + document.domain + ':' + location.port + '/code');
+        let countdownInterval;
+        let currentTime;
+        let nextUpdateTime;
+        let remainingTime;
 
-        // Function to update the timer and request a new code
-        function updateTimer() {
-            let countdown = 30;
-            const timerElement = document.getElementById('timer');
+        socket.on('code_update', function(data) {
+            const codeElement = document.getElementById('attendanceCode');
+            codeElement.textContent = data.code;
 
-            function countDown() {
-                if (countdown === 0) {
-                    countdown = 30;
-                    updateCode();
-                } else {
-                    countdown--;
+            if (currentTime === undefined || nextUpdateTime === undefined) {
+                // Initial setup
+                currentTime = data.current_time;
+                nextUpdateTime = data.next_update_time;
+                remainingTime = nextUpdateTime - currentTime;
+
+                // Display the remaining time as an integer (whole seconds)
+                const timeElement = document.getElementById('timer');
+                timeElement.textContent = Math.ceil(remainingTime);  // Use Math.ceil to avoid negative values
+
+                // Start the countdown timer
+                const updateCountdown = () => {
+                    remainingTime -= 1;
+                    timeElement.textContent = Math.ceil(remainingTime);  // Use Math.ceil to avoid negative values
+                    if (remainingTime >= 0) {
+                        countdownInterval = setTimeout(updateCountdown, 1000);
+                    }
+                };
+                updateCountdown();
+            } else {
+                // Update the current and next update time
+                currentTime = data.current_time;
+                nextUpdateTime = data.next_update_time;
+                remainingTime = nextUpdateTime - currentTime;
+
+                if (remainingTime < 0) {
+                    // Handle negative values by resetting the timer
+                    remainingTime = 0;
                 }
-                timerElement.textContent = countdown;
             }
-
-            setInterval(countDown, 1000);
-            countDown(); // Initialize the countdown
-        }
-
-        document.getElementById('goBackButton').addEventListener('click', function () {
-            window.location.href = '/';
         });
 
-        // Initial code update
-        updateCode();
-        // Start the timer
-        updateTimer();
+        document.getElementById('stopAttendanceButton').addEventListener('click', function() {
+            fetch('/stop_attendance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => console.log(data))
+            .catch(error => console.error('Error stopping attendance: ' + error));
+            window.location.href = '/verify_attendance';
+        });
+
     </script>
 </body>
 </html>

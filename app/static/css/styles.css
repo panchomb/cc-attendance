@@ -66,3 +66,8 @@ h1 {
     font-size: 24px; /* Larger font size for the code */
     color: #0074D9; /* Change the code color to make it more visible */
 }
+
+.hidden {
+    display: none;
+}
+

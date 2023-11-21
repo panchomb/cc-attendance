@@ -16,6 +16,18 @@ stop_timer_thread = threading.Event()
 def home():
     return render_template('index.html')
 
+@app.route('/student_page', methods=["GET"])
+def student_page():
+    return render_template('student_page.html')
+
+@app.route('/professor_page', methods=["GET"])
+def professor_page():
+    return render_template('professor_page.html')
+
+@app.route('/submit_class', methods=["GET"])
+def submit_class():
+    return render_template('submit_class.html')
+
 @app.route('/code', methods=["GET"])
 def show_attendance():
     return render_template('show_attendance.html')

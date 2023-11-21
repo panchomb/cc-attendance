@@ -8,12 +8,12 @@
 </head>
 <body>
     <header>
-        <h1>Welcome to Attendance Checker</h1>
+        <h1>Hi Professor! Welcome to Attendance Checker</h1>
     </header>
     <div class="container">
         <div class="buttons">
-            <a href="{{ url_for('student_page') }}" class="button">Select Student Role</a>
-            <a href="{{ url_for('professor_page') }}" class="button">Select Professor Role</a>
+            <a href="{{ url_for('show_attendance') }}" class="button">Show Attendance Code</a>
+            <a href="{{ url_for('verify_attendance') }}" class="button">Verify Student Attendance</a>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

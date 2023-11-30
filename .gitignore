@@ -1,2 +1,3 @@
 venv/
 func.py
+create_tables.sql

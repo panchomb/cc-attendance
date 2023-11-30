@@ -24,9 +24,18 @@ def student_page():
 def professor_page():
     return render_template('professor_page.html')
 
-@app.route('/submit_class', methods=["GET"])
-def submit_class():
-    return render_template('submit_class.html')
+@app.route('/professor_attendance_page', methods=["GET"])
+def professor_attendance_page():
+    return render_template('professor_attendance_page.html')
+
+@app.route('/submit_class_student', methods=["GET"])
+def submit_class_student():
+    return render_template('submit_class_student.html')
+
+@app.route('/submit_class_professor', methods=["GET"])
+def submit_class_professor():
+    return render_template('submit_class_professor.html')
+
 
 @app.route('/code', methods=["GET"])
 def show_attendance():

@@ -4,16 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <title>Attendance Checker App</title>
+    <title>Checked - Home</title>
+    <subtitle>
+        <s1>Checked - An Attendance Checker App</s1>
+    </subtitle>
 </head>
 <body>
     <header>
-        <h1>Welcome to Attendance Checker</h1>
+        <h1>Welcome to Checked, please select your role to begin:</h1>
     </header>
     <div class="container">
         <div class="buttons">
-            <a href="{{ url_for('student_page') }}" class="button">Select Student Role</a>
-            <a href="{{ url_for('professor_page') }}" class="button">Select Professor Role</a>
+            <a href="{{ url_for('student_page') }}" class="button">I'm a Student</a>
+            <a href="{{ url_for('professor_page')}}" class="button">I'm a Professor</a>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

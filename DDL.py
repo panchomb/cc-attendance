@@ -1,4 +1,15 @@
 import sqlite3
+import mysql.connector
+
+host='dockerlab.westeurope.cloudapp.azure.com'
+username='CC_8'
+password='s8SqfUTpyG7fWRkVpb75BnKbJl-ew5u6J2SZx7vfK48'
+database='CC_8'
+
+conn = mysql.connector.connect(user=username, password=password,
+                                host=host, database=database)
+
+cursor = conn.cursor()
 
 def create_tables(conn):
     cursor = conn.cursor()
@@ -30,6 +41,7 @@ def create_tables(conn):
             semester INTEGER,
             credits INTEGER,
             faculty_id INTEGER,
+            PRIMARY KEY (course_name, semester)
             FOREIGN KEY (faculty_id) REFERENCES Professors(faculty_id)
         );
     ''')
@@ -43,6 +55,7 @@ def create_tables(conn):
             date DATE,
             course_name VARCHAR(255),
             course_semester VARCHAR(255),
+            PRIMARY KEY (course_name, course_semester, number)     
             FOREIGN KEY (course_name) REFERENCES Courses(course_name),
             FOREIGN KEY (course_semester) REFERENCES Courses(semester)
         );

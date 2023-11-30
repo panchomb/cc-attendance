@@ -1,9 +1,10 @@
-from app import app, socketio
+from app import app, db, socketio
 from flask import render_template, request, jsonify
 import random
 import string
 import threading
 import time
+from app.models import Session, Professor, Student, Course, Attendance
 
 code = None
 next_update_time = None

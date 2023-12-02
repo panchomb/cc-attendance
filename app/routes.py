@@ -1,6 +1,6 @@
-from app import app, socketio, db
+from app import app, db
 from flask import render_template, request, jsonify
-from app.models import Student, Professor, Course, Session, Attendance
+from app.models import Student, Professor, Course, Session, Attendance, AttendanceCode
 import random
 import string
 import threading
@@ -41,87 +41,17 @@ def submit_attendance():
 def verify_attendance():
     return render_template('verify_attendance.html')
 
-@socketio.on('connect', namespace='/code')
-def handle_code_connection():
-    global next_update_time, code, timer_thread
-
-    # If there is no code being generated, start the timer and generate a code
-    if timer_thread == None:
-        code = generate_random_code()
-        next_update_time = time.time() + 30
-        print('generating code from new connection')
-        timer_thread = threading.Thread(target=update_code_timer)
-        timer_thread.start()
-
-    print(f'Client connected {request.remote_addr}')
-    
-    socketio.emit('code_update', {'code': code, 'current_time': time.time(), 'next_update_time': next_update_time}, namespace='/code')
-
-@socketio.on('disconnect', namespace='/code')
-def handle_code_disconnection():
-    global timer_thread
-
-    print(f'Client disconnected {request.remote_addr}')
-
-def update_code_timer():
-    global code, next_update_time
-
-    while not stop_timer_thread.is_set():
-        if time.time() >= next_update_time:
-            code = generate_random_code()
-            next_update_time = time.time() + 30
-            socketio.emit('code_update', {'code': code, 'current_time': time.time(), 'next_update_time': next_update_time}, namespace='/code')
-
-@app.route('/check_attendance', methods=["POST"])
-def check_attendance():
-    global code
-
-    response = {}
-
-    if code == None:
-        response['invalid'] = True
-        return jsonify(response)
-
-    request_data = request.get_json()
-    user_code = request_data.get('code', '')
-    
-    if user_code == code:
-        response['verification'] = 'success'
-        attendees['attendees'].append(time.time())
-        print(attendees)
-    else:
-        response['verification'] = 'failure'
-
-    response['invalid'] = False
-    
-    return jsonify(response)
-
 @app.route('/stop_attendance', methods=["POST"])
 def stop_attendance():
-    global timer_thread, code, next_update_time, stop_timer_thread
-    response = {}
+    request_json = request.get_json()
 
-    if timer_thread and timer_thread.is_alive():
-        stop_timer_thread.set()
+    course_name = request_json['course_name']
+    course_semester = request_json['semester']
+    session_number = request_json['number']
 
-        timer_thread.join(timeout=1)
+    students = Attendance.query.filter_by(session_cousre_name=course_name, session_semester=course_semester, session_number=session_number).all()
 
-        if timer_thread.is_alive():
-            print('failed to stop attendance')
-            response['status'] = 'failure'
-        else:
-            response['status'] = 'success'
-            timer_thread = None
-            code = None
-            next_update_time = None
-            attendees['attendees'] = []
-            stop_timer_thread.clear()
-            print('stopping attendance')
-    else:
-        print('error stopping attendance')
-        response['status'] = 'error'
-
-    return jsonify(response)
+    return jsonify([format_student(student) for student in students])
 
 @app.route('/view_attendees', methods=["GET"])
 def view_attendees():
@@ -129,17 +59,30 @@ def view_attendees():
 
     return jsonify(attendees)
 
-def generate_random_code():
-    return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+@app.route('/generate_code', methods=["POST"])
+def generate_code():
+    '''
+    Generate a random 6 character code and insert it into the database
+    '''
+    request_data = request.get_json()
+    course_name = request_data['course_name']
+    semester = request_data['semester']
+    session_number = request_data['number']
 
-def serialize_student(student):
+    code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+    session = Session.query.filter_by(course_name=course_name, semester=semester, number=session_number).first()
+    attendance_code = AttendanceCode(course_name=session.course_name, course_semester=session.semester, session_number=session.number, code=code)
+    db.session.add(attendance_code)
+    db.session.commit()
+
+    return code
+
+
+
+def format_student(student):
     return {
         'student_id': student.student_id,
         'f_name': student.f_name,
         'l_name': student.l_name,
         'student_email': student.student_email
     }
-
-
-if __name__ == '__main__':
-    socketio.run(app, debug=True)

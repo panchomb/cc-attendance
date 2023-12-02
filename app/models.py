@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from app import db
+from datetime import datetime
 
 class Student(db.Model):
     student_id = db.Column(db.Integer, primary_key=True)
@@ -66,3 +67,33 @@ class Attendance(db.Model):
         ),
         {}
     )
+
+class AttendanceCode(db.Model):
+    __tablename__ = 'attendance_code'
+    course_name = db.Column(db.String(255), nullable=False, primary_key=True)
+    course_semester = db.Column(db.Integer, nullable=False, primary_key=True)
+    session_number = db.Column(db.Integer, nullable=False, primary_key=True)
+    code = db.Column(db.String(255), nullable=False, primary_key=True)
+    created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+
+    session = db.relationship(
+        'Session', 
+        backref=db.backref('codes', lazy=True),
+        primaryjoin="and_(AttendanceCode.course_name==Session.course_name, "
+                     "AttendanceCode.course_semester==Session.semester, "
+                     "AttendanceCode.session_number==Session.number)"
+    )
+
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['course_name', 'course_semester', 'session_number'],
+            ['session.course_name', 'session.semester', 'session.number']
+        ),
+        {}
+    )
+
+    def __init__(self, course_name, course_semester, session_number, code):
+        self.course_name = course_name
+        self.course_semester = course_semester
+        self.session_number = session_number
+        self.code = code

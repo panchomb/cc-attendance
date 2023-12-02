@@ -1,10 +1,8 @@
 from flask import Flask
-from flask_socketio import SocketIO
 from flask_sqlalchemy import SQLAlchemy
 import os
 
 app = Flask(__name__)
-socketio = SocketIO(app)
 
 db_host = os.environ.get('DB_HOST')
 db_username = os.environ.get('DB_USERNAME')

@@ -71,7 +71,8 @@ def create_tables(conn):
             course_semester INTEGER NOT NULL,
             session_number INTEGER NOT NULL,
             code VARCHAR(6) NOT NULL,
-            PRIMARY KEY (course_name, course_semester, session_number),
+            created_at DATETIME NOT NULL,
+            PRIMARY KEY (course_name, course_semester, session_number, code),
             FOREIGN KEY (course_name, course_semester, session_number) REFERENCES session(course_name, semester, number)
         );
     ''')

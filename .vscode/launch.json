@@ -17,6 +17,8 @@
                 "DB_USERNAME": "CC_8",
                 "DB_PASSWORD": "s8SqfUTpyG7fWRkVpb75BnKbJl-ew5u6J2SZx7vfK48",
                 "DB_NAME": "CC_8",
+                "queue_name": "dead-letter-queue",
+                "connection_string": "DefaultEndpointsProtocol=https;AccountName=checked;AccountKey=i1GeQB6UsTmZ7EJOlpfp9vl7ttrV8FF4/oYMAosEy01/n1VzloxCGi+a7gp2yDo7M4iokaBypPR3+AStQnj+gg==;EndpointSuffix=core.windows.net"
             }
         }
     ]

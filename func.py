@@ -2,6 +2,7 @@ import logging
 import azure.functions as func
 import json
 from datetime import datetime
+from azure.storage.queue import QueueServiceClient, QueueClient, QueueMessage
 
 headers = {
     "Content-type": "application/json",
@@ -33,16 +34,28 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             course_semester = req_body.get('course_semester')
             session_number = req_body.get('session_number')
             student_id = req_body.get('student_id')
+            code = req_body.get('code')
 
-    # Event is routed to the target database and table
-    try:
-        insert_attendance(course_name, course_semester, session_number, student_id)
-    except Exception as ex:
-        logging.error(ex)
+    
+    current_code = get_attendance_code(course_name, course_semester, session_number)
+    if code == current_code:
+        # Event is routed to the target database and table
+        try:
+            insert_attendance(course_name, course_semester, session_number, student_id)
+        except Exception as ex:
+            logging.error(ex)
+            return func.HttpResponse(
+                    json.dumps(dict(error="Supported parameters: course_name, course_semester, session_number, student_id", exception=str(ex))),
+                    headers=headers,
+                    status_code=400
+            )
+    else:
+        # Send request to Dead Letter Queue (DLQ)
+        send_to_dlq(req)
         return func.HttpResponse(
-                json.dumps(dict(error="Supported parameters: course_name, course_semester, session_number, student_id", exception=str(ex))),
-                headers=headers,
-                status_code=400
+            json.dumps(dict(error="Invalid attendance code. Request sent to Dead Letter Queue.")),
+            headers=headers,
+            status_code=400
         )
 
     # Return the event back to the client as successful feedback
@@ -69,7 +82,7 @@ def insert_attendance(course_name, course_semester, session_number, student_id):
     cnx = mysql.connector.connect(user=username, password=password,
                                 host=host, database=database)
 
-    insert_query = f"INSERT INTO Attendance(course_name, course_semester, session_number, student_id) VALUES ('{course_name}','{course_semester}', {session_number}, {student_id})"
+    insert_query = f"INSERT INTO attendance(session_course_name, session_semester, session_number, student_id) VALUES ('{course_name}','{course_semester}', {session_number}, {student_id})"
 
     cursor = cnx.cursor()
     cursor.execute(insert_query)
@@ -83,7 +96,6 @@ def insert_attendance(course_name, course_semester, session_number, student_id):
 def get_attendance_code(course_name, course_semester, session_number):
     import os
 
-    # This must be set as Function application settings. https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings
     username=os.environ['db_username']
     password=os.environ['db_password']
     host=os.environ['db_host']
@@ -103,3 +115,27 @@ def get_attendance_code(course_name, course_semester, session_number):
     cnx.close()
 
     return result[0]
+
+def send_to_dlq(req: func.HttpRequest):
+    '''
+    Send the request to the Dead Letter Queue (DLQ) in Azure Storage Queue
+    '''
+    import os
+
+    connection_string = os.environ["connection_string"]
+    queue_name = os.environ["queue_name"]
+
+    try:
+        # Create a QueueServiceClient instance using the connection string
+        queue_service_client = QueueServiceClient.from_connection_string(connection_string)
+
+        # Get a reference to the queue
+        queue_client = queue_service_client.get_queue_client(queue_name)
+
+        # Add the request to the queue
+        queue_client.send_message(req.get_body().decode('utf-8'))
+
+    except Exception as ex:
+        logging.error(f"Error sending message to DLQ: {ex}")
+
+    return True

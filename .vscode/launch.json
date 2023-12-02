@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Attendance App",
+            "type": "python",
+            "request": "launch",
+            "program": "run.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "python": "/Users/franciscomagot/Documents/Code/cc/cc_attendance/venv/bin/python3",
+            "env": {
+                "DB_HOST": "dockerlab.westeurope.cloudapp.azure.com",
+                "DB_USERNAME": "CC_8",
+                "DB_PASSWORD": "s8SqfUTpyG7fWRkVpb75BnKbJl-ew5u6J2SZx7vfK48",
+                "DB_NAME": "CC_8",
+            }
+        }
+    ]
+}

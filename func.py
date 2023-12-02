@@ -20,6 +20,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
     course_semester = req.params.get('course_semester')
     session_number = req.params.get('session_number')
     student_id = req.params.get('student_id')
+    code = req.params.get('code')
 
     # For HTTP POST requests, when params are provided in the HTTP body:
     if not course_name or not course_semester or not session_number or not student_id:
@@ -78,3 +79,27 @@ def insert_attendance(course_name, course_semester, session_number, student_id):
     cnx.close()
 
     return True
+
+def get_attendance_code(course_name, course_semester, session_number):
+    import os
+
+    # This must be set as Function application settings. https://learn.microsoft.com/en-us/azure/azure-functions/functions-app-settings
+    username=os.environ['db_username']
+    password=os.environ['db_password']
+    host=os.environ['db_host']
+    database=os.environ['db_name']
+
+    import mysql.connector
+    cnx = mysql.connector.connect(user=username, password=password,
+                                host=host, database=database)
+
+    select_query = f"SELECT code FROM attendance_code WHERE course_name='{course_name}' AND course_semester='{course_semester}' AND session_number={session_number} ORDER BY created_at DESC LIMIT 1"
+
+    cursor = cnx.cursor()
+    cursor.execute(select_query)
+    result = cursor.fetchone()
+
+    cursor.close()
+    cnx.close()
+
+    return result[0]

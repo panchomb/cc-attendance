@@ -18,21 +18,51 @@ class Course(db.Model):
     semester = db.Column(db.Integer, primary_key=True, nullable=False)
     credits = db.Column(db.Integer, nullable=False)
     faculty_id = db.Column(db.Integer, db.ForeignKey('professor.faculty_id'))
+    
     professor = db.relationship('Professor', backref=db.backref('courses', lazy=True))
 
 class Session(db.Model):
-    number = db.Column(db.Integer, primary_key=True)
+    number = db.Column(db.Integer, primary_key=True, nullable=False)
     start = db.Column(db.Time)
     end = db.Column(db.Time)
     date = db.Column(db.Date)
-    course_name = db.Column(db.String(255), db.ForeignKey('course.course_name'), primary_key=True, nullable=False)
-    semester = db.Column(db.Integer, db.ForeignKey('course.semester'), primary_key=True, nullable=False)
-    course = db.relationship('Course', backref=db.backref('sessions', lazy=True))
+    course_name = db.Column(db.String(255), nullable=False)
+    semester = db.Column(db.Integer, nullable=False)
+    
+    course = db.relationship(
+        'Course',
+        backref=db.backref('sessions', lazy=True),
+        primaryjoin="and_(Session.course_name==Course.course_name, Session.semester==Course.semester)"
+    )
+
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['course_name', 'semester'],
+            ['course.course_name', 'course.semester']
+        ),
+        {}
+    )
 
 class Attendance(db.Model):
-    session_course_name = db.Column(db.String(255), primary_key=True, nullable=False)
-    session_semester = db.Column(db.Integer, primary_key=True, nullable=False)
-    session_number = db.Column(db.Integer, primary_key=True, nullable=False)
-    student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), primary_key=True, nullable=False)
-    session = db.relationship('Session', backref=db.backref('attendance', lazy=True))
+    session_course_name = db.Column(db.String(255), nullable=False, primary_key=True)
+    session_semester = db.Column(db.Integer, nullable=False, primary_key=True)
+    session_number = db.Column(db.Integer, nullable=False, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False, primary_key=True)
+    
     student = db.relationship('Student', backref=db.backref('attendance', lazy=True))
+
+    session = db.relationship(
+        'Session', 
+        backref=db.backref('attendance', lazy=True),
+        primaryjoin="and_(Attendance.session_course_name==Session.course_name, "
+                     "Attendance.session_semester==Session.semester, "
+                     "Attendance.session_number==Session.number)"
+    )
+
+    __table_args__ = (
+        db.ForeignKeyConstraint(
+            ['session_course_name', 'session_semester', 'session_number'],
+            ['session.course_name', 'session.semester', 'session.number']
+        ),
+        {}
+    )

@@ -1,5 +1,6 @@
-from app import app, socketio
+from app import app, socketio, db
 from flask import render_template, request, jsonify
+from app.models import Student, Professor, Course, Session, Attendance
 import random
 import string
 import threading
@@ -130,6 +131,15 @@ def view_attendees():
 
 def generate_random_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+def serialize_student(student):
+    return {
+        'student_id': student.student_id,
+        'f_name': student.f_name,
+        'l_name': student.l_name,
+        'student_email': student.student_email
+    }
+
 
 if __name__ == '__main__':
     socketio.run(app, debug=True)

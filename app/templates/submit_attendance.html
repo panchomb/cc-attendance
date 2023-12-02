@@ -9,13 +9,14 @@
 </head>
 <body>
     <header>
-        <h1>Submit Attendance Code for {{ course_name }}, Semester {{ semester }}: Session {{ session_number }}</h1>
+        <h1>{{ student.f_name }} {{ student.l_name }}, submit the Attendance Code for {{ course_name }}, Semester {{ semester }}: Session {{ session_number }}</h1>
     </header>
     <div class="container">
         <form id="attendanceForm">
             <input type="hidden" name="course_name" id="course_name" value="{{ course_name }}">
             <input type="hidden" name="session" id="semester" value="{{ semester }}">
             <input type="hidden" name="session_number" id="session_number" value="{{ session_number }}">
+            <input type="hidden" name="student_id" id="student_id" value="{{ student.student_id }}">
             <label for="codeInput" class="small-text">Input code:</label>
             <input type="text" id="codeInput" name="code" placeholder="Enter code" pattern="[A-Za-z0-9]{6}" required>
             <button type="submit" class="button">Submit</button>
@@ -37,8 +38,7 @@
             const courseName = document.getElementById('course_name').value;
             const semester = document.getElementById('semester').value;
             const sessionNumber = document.getElementById('session_number').value;
-            // TODO - Get the student ID from the session. For now, just hardcode it with a random value between 1 and 10 for testing
-            const studentId = Math.floor(Math.random() * 10) + 1;
+            const studentId = document.getElementById('student_id').value;
 
             // Make a POST request to check_attendance API
             fetch('https://checked-functionapp.azurewebsites.net/api/CodeChecker?code=27o0-0PLxZUDKltqGFKrlxqLw_5HMyqXF1icspV7uHYfAzFuA0NExg==', {

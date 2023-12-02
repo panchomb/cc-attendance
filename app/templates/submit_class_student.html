@@ -33,11 +33,25 @@
 
         <button type="submit" class="submit-button" id="show_code"> Submit </button>
     </div>
+    <div class="container">
+        <input type="hidden" name="selected_student" id="selected-student" value="">
+
+        <label for="student-names">Student Name:</label>
+        <select class="button" name="student-names" id="student-names">
+            <option value="" selected disabled>Select Student</option>
+            {% for student in students %}
+                <option value="{{ student.student_id }}">
+                    {{ student.f_name }} {{ student.l_name }}
+                </option>
+            {% endfor %}
+    </div>
     <script>
         const courseDropdown = document.getElementById('course-names');
         const sessionDropdown = document.getElementById('session-number');
+        const studentDropdown = document.getElementById('student-names');
         const selectedCourseInput = document.getElementById('selected-course');
         const selectedSessionInput = document.getElementById('selected-session');
+        const selectedStudentInput = document.getElementById('selected-student');
 
         courseDropdown.addEventListener('change', function () {
             const selectedCourse = courseDropdown.value;
@@ -65,8 +79,9 @@
             const course_name = selectedCourse.split(';')[0];
             const semester = selectedCourse.split(';')[1];
             const selectedSession = sessionDropdown.value;
+            const selectedStudentId = studentDropdown.value;
 
-            location.href = `/submit_attendance?course_name=${course_name}&semester=${semester}&session=${selectedSession}`;
+            location.href = `/submit_attendance?course_name=${course_name}&semester=${semester}&session=${selectedSession}&student_id=${selectedStudentId}`;
         });
     </script>
 </body>

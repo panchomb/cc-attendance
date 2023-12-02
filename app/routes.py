@@ -23,7 +23,7 @@ def professor_attendance_page():
 
 @app.route('/submit_class_student', methods=["GET"])
 def submit_class_student():
-    return render_template('submit_class_student.html', courses=Course.query.all())
+    return render_template('submit_class_student.html', courses=Course.query.all(), students=Student.query.all())
 
 @app.route('/submit_class_professor', methods=["GET"])
 def submit_class_professor():
@@ -42,8 +42,11 @@ def submit_attendance():
     course_name = request.args.get('course_name')
     semester = request.args.get('semester')
     session_number = request.args.get('session')
+    student_id = request.args.get('student_id')
 
-    return render_template('submit_attendance.html', course_name=course_name, semester=semester, session_number=session_number)
+    student = Student.query.filter_by(student_id=student_id).first()
+
+    return render_template('submit_attendance.html', course_name=course_name, semester=semester, session_number=session_number, student=student)
 
 @app.route('/verify_attendance', methods=["GET"])
 def verify_attendance():

@@ -5,15 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
-    <title>Checked</title>
+    <title>Show Attendance Code</title>
 </head>
 <body>
     <header>
-        <h1>Show Attendance Code</h1>
+        <h1 id="attendanceTitle">Checked</h1>
     </header>
     <div class="container">
         <div class="code-container">
-            <p class="small-text">Current code:</p>
+            <input type="hidden" name="course_name" id="course_name" value="{{ course_name }}">
+            <input type="hidden" name="session" id="semester" value="{{ semester }}">
+            <input type="hidden" name="session_number" id="session_number" value="{{ session_number }}">
+            <p class="small-text">{{ course_name }}, Semester {{ semester }}: Session {{ session_number }} code:</p>
             <p id="attendanceCode" class="code">Loading...</p>
             <p id="countdown" class="small-text">Refreshing in <span id="timer">30</span> seconds</p>
             <button id="stopAttendanceButton" class="button">Stop Attendance</button>
@@ -23,9 +26,15 @@
     <script>
         const attendanceCodeElement = document.getElementById('attendanceCode');
         const timerElement = document.getElementById('timer');
+        const countdownElement = document.getElementById('countdown');
         const stopAttendanceButton = document.getElementById('stopAttendanceButton');
-        const generateCodeButton = document.getElementById('generateCodeButton');
-
+        const attendanceTitleElement = document.getElementById('attendanceTitle');
+    
+        // Get the course and session parameters from the hidden inputs
+        const courseName = document.getElementById('course_name').value;
+        const semester = document.getElementById('semester').value;
+        const sessionNumber = document.getElementById('session_number').value;
+    
         function updateCode() {
             fetch('/generate_code', {
                 method: 'POST',
@@ -33,9 +42,9 @@
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    course_name: 'your_course_name',  // Replace with the actual course name
-                    semester: 1,  // Replace with the actual semester
-                    session_number: 1  // Replace with the actual session number
+                    course_name: courseName,
+                    semester: semester,
+                    session_number: sessionNumber
                 })
             })
             .then(response => response.text())
@@ -44,15 +53,32 @@
             })
             .catch(error => console.error('Error generating code: ' + error));
         }
-
-        // Initial code update
-        updateCode();
-
-        // Event listener for generating a new code
-        generateCodeButton.addEventListener('click', function() {
+    
+        function startTimer() {
+            let timeRemaining = 30;
+    
+            function updateTimer() {
+                timerElement.textContent = timeRemaining;
+                countdownElement.textContent = `Refreshing in ${timeRemaining} seconds`;
+    
+                if (timeRemaining === 0) {
+                    timeRemaining = 30;
+                    updateCode();
+                } else {
+                    timeRemaining--;
+                }
+            }
+    
+            // Initial code update
             updateCode();
-        });
-
+            
+            // Update timer every second
+            setInterval(updateTimer, 1000);
+        }
+    
+        // Start the timer
+        startTimer();
+    
         // Event listener for stopping attendance
         stopAttendanceButton.addEventListener('click', function() {
             fetch('/stop_attendance', {

@@ -8,27 +8,66 @@
 </head>
 <body>
     <header>
-        <h1>Hi Professor, Please select your course and section</h1>
+        <h1>Hi Professor, Please select your course and session</h1>
     </header>
     <div class="container">
+
+        <input type="hidden" name="selected_course" id="selected-course" value="">
+        <input type="hidden" name="selected_session" id="selected-session" value="">
+
         <label for="course-names">Course Title:</label>
-    <select name="dog-names" id="dog-names">
-                <option value="rigatoni">Cloud Computing</option>
-            <option value="dave">Databases</option>
-            <option value="pumpernickel">Technology</option>
-            <option value="reeses">Algorithms</option>
-                </div>
-            </select>
-        <label for="course-codes">Course Code:</label>
-<select name="course-section" id="course-section">
-            <<option value="rigatoni">A</option>
-            <option value="dave">B</option>
-            </div>
-        </div>
-</select>
-                        <a href="{{ url_for('professor_attendance_page') }}" class="button">Submit</a>
-        </div>
+        <select class="button" name="course-names" id="course-names">
+            <option value="" selected disabled>Select Course</option>
+            {% for course in courses %}
+                <option value="{{ course.course_name }};{{ course.semester }}">
+                    {{ course.course_name }}, Semester {{ course.semester }}
+                </option>
+            {% endfor %}
+        </select>
+
+        <label for="course-codes">Session Number:</label>
+        <select class="button" name="session-number" id="session-number">
+            <option value="" selected disabled>Select Session</option>
+            <!-- This part will be populated dynamically based on the selected course -->
+        </select>
+
+        <button type="submit" class="submit-button" id="show_code">Generate Attendance Code</button>
     </div>
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        const courseDropdown = document.getElementById('course-names');
+        const sessionDropdown = document.getElementById('session-number');
+        const selectedCourseInput = document.getElementById('selected-course');
+        const selectedSessionInput = document.getElementById('selected-session');
+
+        courseDropdown.addEventListener('change', function () {
+            const selectedCourse = courseDropdown.value;
+            fetch(`/get_sessions?course=${selectedCourse}`)
+                .then(response => response.json())
+                .then(sessions => {
+                    sessionDropdown.innerHTML = '';
+                    const defaultOption = document.createElement('option');
+                    defaultOption.value = '';
+                    defaultOption.textContent = 'Select Session';
+                    defaultOption.selected = true;
+                    defaultOption.disabled = true;
+                    sessionDropdown.appendChild(defaultOption);
+                    sessions.forEach(session => {
+                        const option = document.createElement('option');
+                        option.value = session.number;
+                        option.textContent = `Session ${session.number}`;
+                        sessionDropdown.appendChild(option);
+                    });
+                });
+        });
+
+        document.getElementById('show_code').addEventListener('click', function () {
+            const selectedCourse = courseDropdown.value;
+            const course_name = selectedCourse.split(';')[0];
+            const semester = selectedCourse.split(';')[1];
+            const selectedSession = sessionDropdown.value;
+
+            location.href = `/code?course_name=${course_name}&semester=${semester}&session=${selectedSession}`;
+        });
+    </script>
 </body>
 </html>

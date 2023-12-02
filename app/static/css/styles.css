@@ -30,6 +30,27 @@ h1 {
     gap: 20px;
 }
 
+.submit-button {
+    padding: 15px;
+    font-size: 18px;
+    background-color: #0074d9a3;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+    margin-bottom: 10px; /* Add margin to the bottom */
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.submit-button:hover {
+    background-color: #0074D9;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
 .button {
     padding: 15px;
     font-size: 18px;
@@ -40,6 +61,9 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
     transition: background-color 0.3s;
+    margin-bottom: 10px; /* Add margin to the bottom */
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .button:hover {

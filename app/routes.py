@@ -3,15 +3,7 @@ from flask import render_template, request, jsonify
 from app.models import Student, Professor, Course, Session, Attendance, AttendanceCode
 import random
 import string
-import threading
 import time
-
-code = None
-next_update_time = None
-timer_thread = None
-attendees = {}
-attendees['attendees'] = []
-stop_timer_thread = threading.Event()
 
 @app.route('/', methods=["GET"])
 def home():
@@ -35,12 +27,15 @@ def submit_class_student():
 
 @app.route('/submit_class_professor', methods=["GET"])
 def submit_class_professor():
-    return render_template('submit_class_professor.html')
-
+    return render_template('submit_class_professor.html', courses=Course.query.all())
 
 @app.route('/code', methods=["GET"])
 def show_attendance():
-    return render_template('show_attendance.html')
+    course_name = request.args.get('course_name')
+    semester = request.args.get('semester')
+    session_number = request.args.get('session')
+
+    return render_template('show_attendance.html', course_name=course_name, semester=semester, session_number=session_number)
 
 @app.route('/submit_attendance', methods=["GET"])
 def submit_attendance():
@@ -76,7 +71,7 @@ def generate_code():
     request_data = request.get_json()
     course_name = request_data['course_name']
     semester = request_data['semester']
-    session_number = request_data['number']
+    session_number = request_data['session_number']
 
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     session = Session.query.filter_by(course_name=course_name, semester=semester, number=session_number).first()
@@ -86,7 +81,11 @@ def generate_code():
 
     return code
 
-
+@app.route('/get_sessions', methods=["GET"])
+def get_sessions():
+    selected_course = request.args.get('course')
+    sessions = Session.query.filter_by(course_name=selected_course.split(';')[0], semester=selected_course.split(';')[1]).all()
+    return jsonify([format_session(session) for session in sessions])
 
 def format_student(student):
     return {
@@ -94,4 +93,21 @@ def format_student(student):
         'f_name': student.f_name,
         'l_name': student.l_name,
         'student_email': student.student_email
+    }
+
+def format_session(session):
+    return {
+        'course_name': session.course_name,
+        'semester': session.semester,
+        'number': session.number,
+        'start': str(session.start),
+        'end': str(session.end),
+        'date': str(session.date)
+    }
+
+def format_course(course):
+    return {
+        'course_name': course.course_name,
+        'semester': course.semester,
+        'professor_id': course.professor_id
     }

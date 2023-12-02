@@ -23,7 +23,7 @@ def professor_attendance_page():
 
 @app.route('/submit_class_student', methods=["GET"])
 def submit_class_student():
-    return render_template('submit_class_student.html')
+    return render_template('submit_class_student.html', courses=Course.query.all())
 
 @app.route('/submit_class_professor', methods=["GET"])
 def submit_class_professor():
@@ -39,11 +39,21 @@ def show_attendance():
 
 @app.route('/submit_attendance', methods=["GET"])
 def submit_attendance():
-    return render_template('submit_attendance.html')
+    course_name = request.args.get('course_name')
+    semester = request.args.get('semester')
+    session_number = request.args.get('session')
+
+    return render_template('submit_attendance.html', course_name=course_name, semester=semester, session_number=session_number)
 
 @app.route('/verify_attendance', methods=["GET"])
 def verify_attendance():
-    return render_template('verify_attendance.html')
+    course_name = request.args.get('course_name')
+    semester = request.args.get('semester')
+    session_number = request.args.get('session_number')
+
+    attendees = Attendance.query.filter_by(session_course_name=course_name, session_semester=semester, session_number=session_number).all()
+
+    return render_template('verify_attendance.html', attendees=attendees, course_name=course_name, semester=semester, session_number=session_number)
 
 @app.route('/stop_attendance', methods=["POST"])
 def stop_attendance():
@@ -53,7 +63,7 @@ def stop_attendance():
     course_semester = request_json['semester']
     session_number = request_json['number']
 
-    students = Attendance.query.filter_by(session_cousre_name=course_name, session_semester=course_semester, session_number=session_number).all()
+    students = Attendance.query.filter_by(session_course_name=course_name, session_semester=course_semester, session_number=session_number).all()
 
     return jsonify([format_student(student) for student in students])
 

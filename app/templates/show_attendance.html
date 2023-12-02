@@ -20,7 +20,6 @@
             <p id="attendanceCode" class="code">Loading...</p>
             <p id="countdown" class="small-text">Refreshing in <span id="timer">30</span> seconds</p>
             <button id="stopAttendanceButton" class="button">Stop Attendance</button>
-            <button id="generateCodeButton" class="button">Generate New Code</button>
         </div>
     </div>
     <script>
@@ -81,16 +80,7 @@
     
         // Event listener for stopping attendance
         stopAttendanceButton.addEventListener('click', function() {
-            fetch('/stop_attendance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => console.log(data))
-            .catch(error => console.error('Error stopping attendance: ' + error));
-            window.location.href = '/verify_attendance';
+            window.location.href = `/verify_attendance?course_name=${courseName}&semester=${semester}&session_number=${sessionNumber}`;
         });
     </script>
 </body>

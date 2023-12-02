@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>Checked</title>
+</head>
+<body>
+    <header>
+        <h1>Hi Professor, Please select your course and section</h1>
+    </header>
+    <div class="container">
+        <label for="course-names">Course Title:</label>
+    <select name="dog-names" id="dog-names">
+                <option value="rigatoni">Cloud Computing</option>
+            <option value="dave">Databases</option>
+            <option value="pumpernickel">Technology</option>
+            <option value="reeses">Algorithms</option>
+                </div>
+            </select>
+        <label for="course-codes">Course Code:</label>
+<select name="course-section" id="course-section">
+            <<option value="rigatoni">A</option>
+            <option value="dave">B</option>
+            </div>
+        </div>
+</select>
+                        <a href="{{ url_for('professor_attendance_page') }}" class="button">Submit</a>
+        </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

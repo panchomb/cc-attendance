@@ -30,7 +30,8 @@
             </tbody>
         </table>
         <h2>Total Attendees: <span id="totalAttendees">0</span></h2>
-        <a href="/" class="button">Go Back</a>
+        <a href="{{ url_for('submit_class_professor')}}" class="button">Go Back to Course Selection</a>
+        <a href="{{ url_for('professor_attendance_page')}}" class="button">Go Back to Previous Page</a>
     </div>
     <script>
         // Function to update the attendees table and counter

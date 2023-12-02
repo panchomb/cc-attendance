@@ -4,65 +4,65 @@ import mysql.connector
 def create_tables(conn):
     cursor = conn.cursor()
 
-    # # Create student table
-    # cursor.execute('''
-    #     CREATE TABLE IF NOT EXISTS student (
-    #         student_id INTEGER PRIMARY KEY,
-    #         f_name VARCHAR(255) NOT NULL,
-    #         l_name VARCHAR(255) NOT NULL,
-    #         student_email VARCHAR(255) UNIQUE NOT NULL
-    #     );
-    # ''')
+    # Create student table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS student (
+            student_id INTEGER PRIMARY KEY,
+            f_name VARCHAR(255) NOT NULL,
+            l_name VARCHAR(255) NOT NULL,
+            student_email VARCHAR(255) UNIQUE NOT NULL
+        );
+    ''')
 
-    # # Create professor table
-    # cursor.execute('''
-    #     CREATE TABLE IF NOT EXISTS professor (
-    #         faculty_id INTEGER PRIMARY KEY,
-    #         f_name VARCHAR(255) NOT NULL,
-    #         l_name VARCHAR(255) NOT NULL,
-    #         faculty_email VARCHAR(255) UNIQUE NOT NULL
-    #     );
-    # ''')
+    # Create professor table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS professor (
+            faculty_id INTEGER PRIMARY KEY,
+            f_name VARCHAR(255) NOT NULL,
+            l_name VARCHAR(255) NOT NULL,
+            faculty_email VARCHAR(255) UNIQUE NOT NULL
+        );
+    ''')
 
-    # # Create course table with a foreign key reference to professor
-    # cursor.execute('''
-    #     CREATE TABLE IF NOT EXISTS course (
-    #         course_name VARCHAR(255) NOT NULL,
-    #         semester INTEGER,
-    #         credits INTEGER,
-    #         faculty_id INTEGER,
-    #         PRIMARY KEY (course_name, semester),
-    #         FOREIGN KEY (faculty_id) REFERENCES professor(faculty_id)
-    #     );
-    # ''')
+    # Create course table with a foreign key reference to professor
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS course (
+            course_name VARCHAR(255) NOT NULL,
+            semester INTEGER,
+            credits INTEGER,
+            faculty_id INTEGER,
+            PRIMARY KEY (course_name, semester),
+            FOREIGN KEY (faculty_id) REFERENCES professor(faculty_id)
+        );
+    ''')
 
-    # # Create session table with number, start, end, date, and foreign keys to course
-    # cursor.execute('''
-    #     CREATE TABLE IF NOT EXISTS session (
-    #         number INTEGER,
-    #         start TIME,
-    #         end TIME,
-    #         date DATE,
-    #         course_name VARCHAR(255),
-    #         semester INTEGER,
-    #         PRIMARY KEY (course_name, semester, number),
-    #         FOREIGN KEY (course_name, semester) REFERENCES course(course_name, semester)
-    #     );
-    # ''')
+    # Create session table with number, start, end, date, and foreign keys to course
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS session (
+            number INTEGER,
+            start TIME,
+            end TIME,
+            date DATE,
+            course_name VARCHAR(255),
+            semester INTEGER,
+            PRIMARY KEY (course_name, semester, number),
+            FOREIGN KEY (course_name, semester) REFERENCES course(course_name, semester)
+        );
+    ''')
 
 
-    # # Create attendance table with foreign keys to session and a student_id column
-    # cursor.execute('''
-    #     CREATE TABLE IF NOT EXISTS attendance (
-    #         session_course_name VARCHAR(255) NOT NULL,
-    #         session_semester INTEGER NOT NULL,
-    #         session_number INTEGER NOT NULL,
-    #         student_id INTEGER NOT NULL,
-    #         PRIMARY KEY (session_course_name, session_semester, session_number, student_id),
-    #         FOREIGN KEY (session_course_name, session_semester, session_number) REFERENCES session(course_name, semester, number),
-    #         FOREIGN KEY (student_id) REFERENCES student(student_id)
-    #     );
-    # ''')
+    # Create attendance table with foreign keys to session and a student_id column
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS attendance (
+            session_course_name VARCHAR(255) NOT NULL,
+            session_semester INTEGER NOT NULL,
+            session_number INTEGER NOT NULL,
+            student_id INTEGER NOT NULL,
+            PRIMARY KEY (session_course_name, session_semester, session_number, student_id),
+            FOREIGN KEY (session_course_name, session_semester, session_number) REFERENCES session(course_name, semester, number),
+            FOREIGN KEY (student_id) REFERENCES student(student_id)
+        );
+    ''')
 
     # Create table for attendance codes
     cursor.execute('''

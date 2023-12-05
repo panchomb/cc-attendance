@@ -89,7 +89,7 @@
             })
             .then(response => {
                 if (response.status === 200) {
-                    window.location.href = `/verify_attendance?course_name=${courseName}&semester=${semester}&session_number=${sessionNumber}`;
+                    window.location.href = `/verify_attendance?course_name=${courseName}&semester=${semester}&session=${sessionNumber}`;
                 } else {
                     console.error('Error stopping attendance');
                 }

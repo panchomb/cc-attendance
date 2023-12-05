@@ -19,10 +19,10 @@
             <input type="hidden" name="student_id" id="student_id" value="{{ student.student_id }}">
             <label for="codeInput" class="small-text">Input code:</label>
             <input type="text" id="codeInput" name="code" placeholder="Enter code" pattern="[A-Za-z0-9]{6}" required>
-            <button type="submit" class="button">Submit</button>
+            <button type="submit" class="submit-button">Submit</button>
         </form>
         <div id="successMessage" class="message hidden">Attendance verified successfully. Redirecting to home page...</div>
-        <div id="errorMessage" class="message hidden">Error: Code is not correct.</div>
+        <div id="errorMessage" class="message hidden">Error submitting attendance code.</div>
         <div id="invalidMessage" class="message hidden">Error: Attendance is not being taken.</div>
     </div>
     <script>    

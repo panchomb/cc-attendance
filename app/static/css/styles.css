@@ -110,3 +110,24 @@ tr:nth-child(even) {
 .hidden {
     display: none;
 }
+
+#codeInput {
+    padding: 15px;
+    font-size: 18px;
+    margin: 10px;
+    background-color: #1E1E1E;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s;
+}
+
+#codeInput:focus {
+    outline: none;
+    box-shadow: 0 0 10px #0074D9;
+}
+
+#codeInput::placeholder {
+    color: #ffffff81;
+}

@@ -34,8 +34,10 @@
             </tbody>
         </table>
         <h2>Total Attendees: <span id="totalAttendees">{{ attendees|length }}</span></h2>
-        <a href="{{ url_for('submit_class_professor')}}" class="button">Go Back to Course Selection</a>
-        <a href="{{ url_for('professor_attendance_page')}}" class="button">Go Back to Previous Page</a>
+        <br>
+        <a href="{{ url_for('professor_page')}}" class="button"> Go Back to Professor Main Menu </a>
+        <a href="{{ url_for('submit_class_professor')}}" class="button"> Generate Code for Another Session </a>
+        <a href="{{ url_for('verify_attendance_select')}}" class="button"> Select Another Session to Verify Attendance </a>
     </div>
 </body>
 </html>

@@ -17,10 +17,6 @@ def student_page():
 def professor_page():
     return render_template('professor_page.html')
 
-@app.route('/professor_attendance_page', methods=["GET"])
-def professor_attendance_page():
-    return render_template('professor_attendance_page.html')
-
 @app.route('/submit_class_student', methods=["GET"])
 def submit_class_student():
     return render_template('submit_class_student.html', courses=Course.query.all(), students=Student.query.all())
@@ -48,11 +44,15 @@ def submit_attendance():
 
     return render_template('submit_attendance.html', course_name=course_name, semester=semester, session_number=session_number, student=student)
 
+@app.route('/verify_attendance_select', methods=["GET"])
+def verify_attendance_select():
+    return render_template('verify_attendance_select.html', courses=Course.query.all())
+
 @app.route('/verify_attendance', methods=["GET"])
 def verify_attendance():
     course_name = request.args.get('course_name')
     semester = request.args.get('semester')
-    session_number = request.args.get('session_number')
+    session_number = request.args.get('session')
 
     attendees = Attendance.query.filter_by(session_course_name=course_name, session_semester=semester, session_number=session_number).all()
 
@@ -61,14 +61,20 @@ def verify_attendance():
 @app.route('/stop_attendance', methods=["POST"])
 def stop_attendance():
     request_json = request.get_json()
+    response = {}
 
     course_name = request_json['course_name']
     course_semester = request_json['semester']
-    session_number = request_json['number']
+    session_number = request_json['session_number']
 
-    students = Attendance.query.filter_by(session_course_name=course_name, session_semester=course_semester, session_number=session_number).all()
+    # disable last generated attendance code
+    last_code = AttendanceCode.query.filter_by(course_name=course_name, course_semester=course_semester, session_number=session_number).order_by(AttendanceCode.created_at.desc()).first()
+    if last_code:
+        last_code.active = False
+    db.session.commit()
 
-    return jsonify([format_student(student) for student in students])
+    response["message"] = "Attendance stopped"
+    return jsonify(response)
 
 @app.route('/view_attendees', methods=["GET"])
 def view_attendees():
@@ -85,6 +91,12 @@ def generate_code():
     course_name = request_data['course_name']
     semester = request_data['semester']
     session_number = request_data['session_number']
+
+    # Filter the last generate code for this session (ordering by the created_at attriubte)
+    # and set it to inactive
+    last_code = AttendanceCode.query.filter_by(course_name=course_name, course_semester=semester, session_number=session_number).order_by(AttendanceCode.created_at.desc()).first()
+    if last_code:
+        last_code.active = False
 
     code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
     session = Session.query.filter_by(course_name=course_name, semester=semester, number=session_number).first()

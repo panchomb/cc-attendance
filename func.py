@@ -37,15 +37,22 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
             code = req_body.get('code')
 
     
-    current_code = get_attendance_code(course_name, course_semester, session_number)
+    current_code, active = get_attendance_code(course_name, course_semester, session_number)
     if code == current_code:
-        # Event is routed to the target database and table
-        try:
-            insert_attendance(course_name, course_semester, session_number, student_id)
-        except Exception as ex:
-            logging.error(ex)
+        if active == True:
+            # Event is routed to the target database and table
+            try:
+                insert_attendance(course_name, course_semester, session_number, student_id)
+            except Exception as ex:
+                logging.error(ex)
+                return func.HttpResponse(
+                        json.dumps(dict(error="Supported parameters: course_name, course_semester, session_number, student_id", exception=str(ex))),
+                        headers=headers,
+                        status_code=400
+                )
+        else:
             return func.HttpResponse(
-                    json.dumps(dict(error="Supported parameters: course_name, course_semester, session_number, student_id", exception=str(ex))),
+                    json.dumps(dict(error="Attendance code is not active.")),
                     headers=headers,
                     status_code=400
             )
@@ -53,7 +60,7 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         # Send request to Dead Letter Queue (DLQ)
         send_to_dlq(req)
         return func.HttpResponse(
-            json.dumps(dict(error="Invalid attendance code. Request sent to Dead Letter Queue.")),
+            json.dumps(dict(error="Invalid attendance code.")),
             headers=headers,
             status_code=400
         )
@@ -105,7 +112,7 @@ def get_attendance_code(course_name, course_semester, session_number):
     cnx = mysql.connector.connect(user=username, password=password,
                                 host=host, database=database)
 
-    select_query = f"SELECT code FROM attendance_code WHERE course_name='{course_name}' AND course_semester='{course_semester}' AND session_number={session_number} ORDER BY created_at DESC LIMIT 1"
+    select_query = f"SELECT code, active FROM attendance_code WHERE course_name='{course_name}' AND course_semester='{course_semester}' AND session_number={session_number} ORDER BY created_at DESC LIMIT 1"
 
     cursor = cnx.cursor()
     cursor.execute(select_query)
@@ -114,7 +121,7 @@ def get_attendance_code(course_name, course_semester, session_number):
     cursor.close()
     cnx.close()
 
-    return result[0]
+    return result
 
 def send_to_dlq(req: func.HttpRequest):
     '''

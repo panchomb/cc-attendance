@@ -72,6 +72,7 @@ def create_tables(conn):
             session_number INTEGER NOT NULL,
             code VARCHAR(6) NOT NULL,
             created_at DATETIME NOT NULL,
+            active BOOLEAN NOT NULL DEFAULT TRUE,
             PRIMARY KEY (course_name, course_semester, session_number, code),
             FOREIGN KEY (course_name, course_semester, session_number) REFERENCES session(course_name, semester, number)
         );
@@ -169,7 +170,7 @@ def main():
 
     # Call functions to create tables and insert data
     create_tables(conn)
-    #insert_data(conn)
+    insert_data(conn)
 
     # Close the database connection
     conn.close()

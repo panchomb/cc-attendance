@@ -75,6 +75,7 @@ class AttendanceCode(db.Model):
     session_number = db.Column(db.Integer, nullable=False, primary_key=True)
     code = db.Column(db.String(255), nullable=False, primary_key=True)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    active = db.Column(db.Boolean, nullable=False, default=True)
 
     session = db.relationship(
         'Session', 

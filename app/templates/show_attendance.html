@@ -74,13 +74,35 @@
             // Update timer every second
             setInterval(updateTimer, 1000);
         }
+
+        function stopAttendance() {
+            fetch('/stop_attendance', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    course_name: courseName,
+                    semester: semester,
+                    session_number: sessionNumber
+                })
+            })
+            .then(response => {
+                if (response.status === 200) {
+                    window.location.href = `/verify_attendance?course_name=${courseName}&semester=${semester}&session_number=${sessionNumber}`;
+                } else {
+                    console.error('Error stopping attendance');
+                }
+            })
+            .catch(error => console.error('Error stopping attendance: ' + error));
+        }
     
         // Start the timer
         startTimer();
     
         // Event listener for stopping attendance
         stopAttendanceButton.addEventListener('click', function() {
-            window.location.href = `/verify_attendance?course_name=${courseName}&semester=${semester}&session_number=${sessionNumber}`;
+            stopAttendance();
         });
     </script>
 </body>

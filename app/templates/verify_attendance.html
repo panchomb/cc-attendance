@@ -15,49 +15,29 @@
 </head>
 <body>
     <header>
-        <h1>Verify Attendance</h1>
+        <h1> Attendance List for "{{ course_name }}, Semester {{ semester }}: Session {{ session_number }}"</h1>
     </header>
     <div class="container">
         <h2>Attendees</h2>
         <table class="centered-table">
             <thead>
                 <tr>
-                    <th>Timestamp</th>
+                    <th>Full Name</th>
                 </tr>
             </thead>
             <tbody id="attendeesTable">
-                <!-- Attendees will be added here dynamically -->
+                {% for attendance in attendees %}
+                    <tr>
+                        <td>{{ attendance.student.f_name }} {{ attendance.student.l_name }}</td>
+                    </tr>
+                {% endfor %}
             </tbody>
         </table>
-        <h2>Total Attendees: <span id="totalAttendees">0</span></h2>
-        <a href="{{ url_for('submit_class_professor')}}" class="button">Go Back to Course Selection</a>
-        <a href="{{ url_for('professor_attendance_page')}}" class="button">Go Back to Previous Page</a>
+        <h2>Total Attendees: <span id="totalAttendees">{{ attendees|length }}</span></h2>
+        <br>
+        <a href="{{ url_for('professor_page')}}" class="button"> Go Back to Professor Main Menu </a>
+        <a href="{{ url_for('submit_class_professor')}}" class="button"> Generate Code for Another Session </a>
+        <a href="{{ url_for('verify_attendance_select')}}" class="button"> Select Another Session to Verify Attendance </a>
     </div>
-    <script>
-        // Function to update the attendees table and counter
-        function updateAttendees(attendeesData) {
-            const attendeesTable = document.getElementById("attendeesTable");
-            const totalAttendees = document.getElementById("totalAttendees");
-            attendeesTable.innerHTML = ""; // Clear the table
-
-            attendeesData.forEach((timestamp, index) => {
-                const row = attendeesTable.insertRow();
-                const cell = row.insertCell(0);
-                cell.textContent = new Date(timestamp * 1000).toLocaleString();
-            });
-
-            totalAttendees.textContent = attendeesData.length;
-        }
-
-        // Fetch attendees data from the server
-        fetch("/view_attendees")
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.attendees && data.attendees.length > 0) {
-                    updateAttendees(data.attendees);
-                }
-            })
-            .catch((error) => console.error("Error fetching attendees data: " + error));
-    </script>
 </body>
 </html>

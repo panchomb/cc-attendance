@@ -9,16 +9,20 @@
 </head>
 <body>
     <header>
-        <h1>Submit Attendance Code</h1>
+        <h1>{{ student.f_name }} {{ student.l_name }}, submit the Attendance Code for {{ course_name }}, Semester {{ semester }}: Session {{ session_number }}</h1>
     </header>
     <div class="container">
         <form id="attendanceForm">
+            <input type="hidden" name="course_name" id="course_name" value="{{ course_name }}">
+            <input type="hidden" name="session" id="semester" value="{{ semester }}">
+            <input type="hidden" name="session_number" id="session_number" value="{{ session_number }}">
+            <input type="hidden" name="student_id" id="student_id" value="{{ student.student_id }}">
             <label for="codeInput" class="small-text">Input code:</label>
             <input type="text" id="codeInput" name="code" placeholder="Enter code" pattern="[A-Za-z0-9]{6}" required>
-            <button type="submit" class="button">Submit</button>
+            <button type="submit" class="submit-button">Submit</button>
         </form>
         <div id="successMessage" class="message hidden">Attendance verified successfully. Redirecting to home page...</div>
-        <div id="errorMessage" class="message hidden">Error: Code is not correct.</div>
+        <div id="errorMessage" class="message hidden">Error submitting attendance code.</div>
         <div id="invalidMessage" class="message hidden">Error: Attendance is not being taken.</div>
     </div>
     <script>    
@@ -29,37 +33,37 @@
             const errorMessage = document.getElementById('errorMessage');
             const invalidMessage = document.getElementById('invalidMessage');
             
-            // Get the code from the input field
+            // Get the code and session information from the hidden inputs
             const code = codeInput.value;
+            const courseName = document.getElementById('course_name').value;
+            const semester = document.getElementById('semester').value;
+            const sessionNumber = document.getElementById('session_number').value;
+            const studentId = document.getElementById('student_id').value;
 
             // Make a POST request to check_attendance API
-            fetch('/check_attendance', {
+            fetch('https://checked-functionapp.azurewebsites.net/api/CodeCheck?code=CyCrqgkV0mEzxlAKhOXnRd0oxmnbyi5GCPyKd0AzKrpLAzFuNsF4DA==', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ code: code })
+                body: JSON.stringify({ 
+                    course_name: courseName,
+                    course_semester: semester,
+                    session_number: sessionNumber,
+                    student_id: studentId,
+                    code: code
+                })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.invalid === true) {
-                    // Show error message
-                    invalidMessage.classList.remove('hidden');
-                    successMessage.classList.add('hidden');
-                    errorMessage.classList.add('hidden');
-                }
-                else if (data.verification === 'success') {
-                    // Show success message and then redirect to the home page
+            .then(response => {
+                if (response.status === 200) {
                     successMessage.classList.remove('hidden');
                     errorMessage.classList.add('hidden');
                     setTimeout(() => {
-                        window.location.href = '/';
-                    }, 5000);
+                        window.location.href = '/student_page';
+                    }, 3000);
                 } else {
-                    // Show error message
-                    errorMessage.classList.remove('hidden');
                     successMessage.classList.add('hidden');
-                    invalidMessage.classList.add('hidden');
+                    errorMessage.classList.remove('hidden');
                 }
             })
             .catch(error => {

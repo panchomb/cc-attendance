@@ -12,7 +12,8 @@
     </header>
     <div class="container">
         <div class="buttons">
-            <a href="{{ url_for('submit_class_professor')}}" class="button">Select the class and section</a>
+            <a href="{{ url_for('submit_class_professor')}}" class="button">Generate Attendance Code</a>
+            <a href="{{ url_for('verify_attendance_select') }}" class="button">Verify Student Attendance</a>
         </div>
     </div>
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>

@@ -6,12 +6,6 @@ import string
 import time
 from app.models import Session, Professor, Student, Course, Attendance
 
-code = None
-next_update_time = None
-timer_thread = None
-attendees = {}
-attendees['attendees'] = []
-stop_timer_thread = threading.Event()
 
 @app.route('/', methods=["GET"])
 def home():
